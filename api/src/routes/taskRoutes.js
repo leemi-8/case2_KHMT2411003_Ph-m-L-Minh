@@ -3,7 +3,8 @@ const router = express.Router();
 const Task = require('../models/Task');
 const User = require('../models/User');
 const TaskShare = require('../models/TaskShare');
-
+const Notification = require('../models/Notification');
+const { sendEmailNotification } = require('../../services/emailService');
 // 1. GET /api/tasks - Lấy danh sách công việc
 router.get('/', async (req, res) => {
   try {
@@ -79,23 +80,28 @@ router.get('/users/search', async (req, res) => {
 });
 router.post('/:id/shares', async (req, res) => {
   try {
-    const { userId, permission } = req.body;
-    const share = await TaskShare.findOneAndUpdate(
-      { taskId: req.params.id, userId },
-      { permission, sharedBy: req.body.sharedBy },
-      { upsert: true, new: true }
-    );
-    res.status(201).json({ message: 'Chia sẻ thành công', share });
-  } catch (err) {
-    res.status(500).json({ message: 'Không thể chia sẻ công việc' });
-  }
-});
-router.get('/:id/shares', async (req, res) => {
-  try {
-    const shares = await TaskShare.find({ taskId: req.params.id }).populate('userId', 'fullName email');
-    res.json(shares);
-  } catch (err) {
-    res.status(500).json({ message: 'Lỗi tải danh sách chia sẻ' });
+    const taskId = req.params.id;
+    const { userId, permission } = req.body; // userId được chia sẻ
+
+    // ... (Code lưu TaskShare cũ của bạn ở đây) ...
+
+    // 1. Tạo thông báo trong Database cho người được chia sẻ
+    const task = await Task.findById(taskId);
+    await Notification.create({
+      userId: userId,
+      title: 'Công việc mới được chia sẻ',
+      message: `Bạn đã được cấp quyền ${permission} cho công việc "${task ? task.title : 'Công việc'}"`,
+    });
+
+    // 2. Gửi Email thông báo
+    const recipientUser = await User.findById(userId);
+    if (recipientUser && recipientUser.email) {
+      sendEmailNotification(recipientUser.email, task.title, 'Hệ thống TaskManager');
+    }
+
+    res.status(201).json({ message: 'Chia sẻ công việc thành công!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi chia sẻ công việc', error });
   }
 });
 module.exports = router;

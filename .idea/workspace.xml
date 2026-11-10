@@ -5,11 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2e2e797-8664-4f99-a960-147eb3b2c19a" name="Changes" comment="commit1">
-      <change afterPath="$PROJECT_DIR$/api/src/models/TaskShare.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/services/emailService.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/src/models/Notification.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/src/routes/notificationRoutes.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taskmanager/lib/screens/notification_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taskmanager/lib/services/notification_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/api/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/api/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/api/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/server.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/src/routes/taskRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/routes/taskRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taskmanager/lib/screens/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/lib/screens/home_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taskmanager/lib/services/task_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taskmanager/lib/services/task_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +69,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "feature/C-sharing",
+    "git-widget-placeholder": "main",
     "io.flutter.project.isFirstOpen": "true",
     "kotlin-language-version-configured": "true",
     "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
@@ -71,6 +78,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\case2_khmt24111003_phamleminh\api" />
+      <recent name="E:\case2_khmt24111003_phamleminh\api\src" />
       <recent name="E:\case2_khmt24111003_phamleminh\taskmanager\lib\screens" />
     </key>
   </component>

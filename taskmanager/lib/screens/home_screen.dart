@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/task_service.dart';
 import 'login_screen.dart';
-
+import 'notification_screen.dart';
 class HomeScreen extends StatefulWidget {
   final String fullName;
   final String userId;
@@ -240,6 +240,19 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Công việc của ${widget.fullName}'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotificationScreen(
+                    userId: widget.userId.isNotEmpty ? widget.userId : '650000000000000000000000',
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {

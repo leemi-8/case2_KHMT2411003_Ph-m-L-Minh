@@ -6,7 +6,8 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+const notificationRoutes = require('./src/routes/notificationRoutes');
+app.use('/api/notifications', notificationRoutes);
 // Khai báo các routes (trỏ đúng thư mục ./src/routes/)
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/tasks', require('./src/routes/taskRoutes'));
