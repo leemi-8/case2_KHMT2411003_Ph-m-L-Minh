@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task');
+const User = require('../models/User');
+const TaskShare = require('../models/TaskShare');
 
 // 1. GET /api/tasks - Lấy danh sách công việc
 router.get('/', async (req, res) => {
@@ -61,5 +63,39 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Lỗi xóa công việc', error: error.message });
   }
 });
-
+router.get('/users/search', async (req, res) => {
+  try {
+    const query = req.query.q || '';
+    const users = await User.find({
+      $or: [
+        { fullName: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } }
+      ]
+    }).select('_id fullName email');
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi máy chủ' });
+  }
+});
+router.post('/:id/shares', async (req, res) => {
+  try {
+    const { userId, permission } = req.body;
+    const share = await TaskShare.findOneAndUpdate(
+      { taskId: req.params.id, userId },
+      { permission, sharedBy: req.body.sharedBy },
+      { upsert: true, new: true }
+    );
+    res.status(201).json({ message: 'Chia sẻ thành công', share });
+  } catch (err) {
+    res.status(500).json({ message: 'Không thể chia sẻ công việc' });
+  }
+});
+router.get('/:id/shares', async (req, res) => {
+  try {
+    const shares = await TaskShare.find({ taskId: req.params.id }).populate('userId', 'fullName email');
+    res.json(shares);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải danh sách chia sẻ' });
+  }
+});
 module.exports = router;
