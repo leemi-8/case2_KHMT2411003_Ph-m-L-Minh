@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchTasks();
   }
 
-  // Tải danh sách công việc
+  // Tải danh sách công việc từ Backend
   Future<void> _fetchTasks() async {
     setState(() => _isLoading = true);
     final tasks = await TaskService.getTasks();
@@ -32,25 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Đổi trạng thái công việc (Hoàn thành / Chưa hoàn thành)
-  Future<void> _toggleTaskStatus(String id, String currentStatus) async {
-    final newStatus = currentStatus == 'completed' ? 'todo' : 'completed';
-    final success = await TaskService.updateTaskStatus(id, newStatus);
-    if (success) _fetchTasks();
-  }
-
-  // Xóa công việc
-  Future<void> _deleteTask(String id) async {
-    final success = await TaskService.deleteTask(id);
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã xóa công việc!'), backgroundColor: Colors.red),
-      );
-      _fetchTasks();
-    }
-  }
-
-  // Hộp thoại tạo mới công việc
+  // Hộp thoại tạo công việc mới
   void _showAddTaskDialog() {
     final titleController = TextEditingController();
     final descController = TextEditingController();
@@ -74,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: priority,
-              decoration: const InputDecoration(labelText: 'Mức ưu tiên'),
+              decoration: const InputDecoration(labelText: 'Đức ưu tiên'),
               items: const [
                 DropdownMenuItem(value: 'low', child: Text('Thấp')),
                 DropdownMenuItem(value: 'medium', child: Text('Trung bình')),
@@ -107,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(res['message'])),
                 );
-                _fetchTasks();
+                _fetchTasks(); // Tải lại danh sách sau khi thêm thành công
               }
             },
             child: const Text('Lưu'),
@@ -145,45 +127,35 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: _tasks.length,
           itemBuilder: (context, index) {
             final task = _tasks[index];
-            final isCompleted = task['status'] == 'completed';
-
             return Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: ListTile(
-                leading: IconButton(
-                  icon: Icon(
-                    isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: isCompleted ? Colors.green : Colors.grey,
-                  ),
-                  onPressed: () => _toggleTaskStatus(task['_id'], task['status'] ?? 'todo'),
+                leading: Icon(
+                  task['status'] == 'completed'
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: task['status'] == 'completed' ? Colors.green : Colors.orange,
                 ),
                 title: Text(
                   task['title'] ?? '',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    decoration: task['status'] == 'completed'
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
                 ),
                 subtitle: Text(task['description'] ?? 'Không có mô tả'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Chip(
-                      label: Text(
-                        (task['priority'] ?? 'medium').toUpperCase(),
-                        style: const TextStyle(color: Colors.white, fontSize: 10),
-                      ),
-                      backgroundColor: task['priority'] == 'high'
-                          ? Colors.red
-                          : task['priority'] == 'medium'
-                          ? Colors.blue
-                          : Colors.grey,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.redAccent),
-                      onPressed: () => _deleteTask(task['_id']),
-                    ),
-                  ],
+                trailing: Chip(
+                  label: Text(
+                    (task['priority'] ?? 'medium').toUpperCase(),
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                  backgroundColor: task['priority'] == 'high'
+                      ? Colors.red
+                      : task['priority'] == 'medium'
+                      ? Colors.blue
+                      : Colors.grey,
                 ),
               ),
             );
