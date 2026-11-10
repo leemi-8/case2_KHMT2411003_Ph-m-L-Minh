@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/task_service.dart';
 import 'login_screen.dart';
 import 'notification_screen.dart';
+import 'profile_screen.dart';
 class HomeScreen extends StatefulWidget {
   final String fullName;
   final String userId;
@@ -241,6 +242,20 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Công việc của ${widget.fullName}'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                    fullName: widget.fullName,
+                    userId: widget.userId.isNotEmpty ? widget.userId : '650000000000000000000000',
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
               Navigator.push(
@@ -261,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             },
-          )
+          ),
         ],
       ),
       body: _isLoading
