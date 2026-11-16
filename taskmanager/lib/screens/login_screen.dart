@@ -35,20 +35,25 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (result['success']) {
+      final userObj = result['user'] ?? {};
+      final String realUserId = (userObj['_id'] ?? userObj['id'] ?? '').toString();
+      final String realFullName = (userObj['fullName'] ?? 'Người dùng').toString();
+
+      print('>>> KIỂM TRA LOGIN - TÊN: $realFullName | USER_ID: $realUserId');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Đăng nhập thành công! Chào ${result['user']['fullName']}'),
+          content: Text('Đăng nhập thành công! Chào $realFullName'),
           backgroundColor: Colors.green,
         ),
       );
 
-      // Chuyển hướng sang HomeScreen khi Đăng nhập thành công
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(
-            fullName: result['user']['fullName'],
-            userId: result['user']['id'],
+            fullName: realFullName,
+            userId: realUserId,
           ),
         ),
       );

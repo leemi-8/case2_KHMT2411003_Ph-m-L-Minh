@@ -1,35 +1,66 @@
 const nodemailer = require('nodemailer');
+const EmailLog = require('../src/models/EmailLog');
 
-// Cấu hình dịch vụ gửi Email (Sử dụng SMTP Gmail)
+// Cấu hình dịch vụ gửi Email (Ưu tiên biến môi trường .env nếu có)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'your_email@gmail.com', // Thay bằng Email gửi của bạn
-    pass: 'your_app_password'     // Mật khẩu ứng dụng Gmail (App Password)
+    user: process.env.EMAIL_USER || 'kirapo123456654321@gmail.com',
+    pass: process.env.EMAIL_PASS || 'zcgh sykg xxau ozqc'
+
   }
 });
 
-const sendEmailNotification = async (toEmail, taskTitle, senderName) => {
+// Hàm gửi email tổng quát và tự động lưu lịch sử vào collection EmailLog
+const sendTaskEmail = async ({ toEmail, subject, htmlContent, eventType = 'notification' }) => {
+  if (!toEmail) return;
   try {
     const mailOptions = {
-      from: '"Task Manager App" <your_email@gmail.com>',
+      from: `"Task Manager App" <${process.env.EMAIL_USER || 'your_email@gmail.com'}>`,
       to: toEmail,
-      subject: 'Bạn vừa được chia sẻ một công việc mới!',
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>Thông báo công việc mới</h2>
-          <p>Xin chào,</p>
-          <p>Người dùng <b>${senderName}</b> vừa chia sẻ công việc <b>"${taskTitle}"</b> với bạn.</p>
-          <p>Vui lòng mở ứng dụng Task Manager để xem chi tiết.</p>
-        </div>
-      `
+      subject,
+      html: htmlContent
     };
 
     await transporter.sendMail(mailOptions);
-    console.log('Đã gửi email thông báo thành công đến:', toEmail);
+    console.log(`[Email SUCCESS] Đã gửi (${eventType}) tới:`, toEmail);
+
+    await EmailLog.create({
+      recipient: toEmail,
+      subject,
+      eventType,
+      status: 'success',
+      sentAt: new Date()
+    });
   } catch (error) {
-    console.error('Lỗi khi gửi email:', error);
+    console.error(`[Email FAILED] Lỗi gửi (${eventType}) tới ${toEmail}:`, error.message);
+
+    await EmailLog.create({
+      recipient: toEmail,
+      subject,
+      eventType,
+      status: 'failed',
+      errorMessage: error.message,
+      sentAt: new Date()
+    });
   }
 };
 
-module.exports = { sendEmailNotification };
+// Giữ tương thích với hàm cũ khi chia sẻ/giao việc
+const sendEmailNotification = async (toEmail, taskTitle, senderName, eventType = 'share') => {
+  const subject = eventType === 'assign'
+    ? `Bạn được giao công việc mới: "${taskTitle}"`
+    : `Bạn được mời tham gia công việc: "${taskTitle}"`;
+
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>${subject}</h2>
+      <p>Xin chào,</p>
+      <p><b>${senderName}</b> vừa thực hiện thao tác trên công việc <b>"${taskTitle}"</b>.</p>
+      <p>Vui lòng mở ứng dụng Task Manager để kiểm tra chi tiết.</p>
+    </div>
+  `;
+  await sendTaskEmail({ toEmail, subject, htmlContent, eventType });
+};
+
+module.exports = { sendEmailNotification, sendTaskEmail };

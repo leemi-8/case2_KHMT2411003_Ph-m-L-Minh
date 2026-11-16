@@ -9,7 +9,8 @@ const notificationSchema = new mongoose.Schema({
   title: { type: String, required: true },
   message: { type: String, required: true },
   isRead: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' }
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);
